@@ -10,6 +10,14 @@
           <option name="port" value="21" />
         </fileTransfer>
       </webServer>
+      <webServer id="07158afb-9fea-4e45-a08c-18de7d3697c8" name="Host2" url="http://ftp.dimondachnoe.esy.es">
+        <fileTransfer host="ftp.dimondachnoe.esy.es" port="21">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" />
+          </advancedOptions>
+          <option name="port" value="21" />
+        </fileTransfer>
+      </webServer>
     </option>
   </component>
 </project>

@@ -9,7 +9,7 @@ return array(
 
 //return array(
 //    'host' => 'mysql.hostinger.com.ua',
-//    'dbname' => 'u254161639_super',
-//    'user' => 'u254161639_root',
-//    'password' => 'Telkontar1994',
+//    'dbname' => 'u260289564_blog',
+//    'user' => 'u260289564_root',
+//    'password' => '',
 //);
