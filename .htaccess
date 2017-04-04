@@ -6,4 +6,13 @@ RewriteBase /
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 
+ErrorDocument 400 /components/errors.php
+ErrorDocument 403 /components/errors.php
+ErrorDocument 404 /components/errors.php
+ErrorDocument 405 /components/errors.php
+ErrorDocument 408 /components/errors.php
+ErrorDocument 500 /components/errors.php
+ErrorDocument 502 /components/errors.php
+ErrorDocument 504 /components/errors.php
+
 RewriteRule ^(.*)$ index.php

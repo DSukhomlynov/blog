@@ -2,7 +2,7 @@
 <project version="4">
   <component name="WebServers">
     <option name="servers">
-      <webServer id="f9eb3697-fdbe-4beb-9e56-c7124ea2cc32" name="Host" url="http://ftp.dimondachnoe-in-sh.esy.es">
+      <webServer id="1e6bdf00-7f84-4e63-b6fc-ba6d29cc0229" name="Host" url="http://ftp.dimondachnoe-in-sh.esy.es">
         <fileTransfer host="ftp.dimondachnoe-in-sh.esy.es" port="21">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" passiveMode="true" />
@@ -10,7 +10,7 @@
           <option name="port" value="21" />
         </fileTransfer>
       </webServer>
-      <webServer id="07158afb-9fea-4e45-a08c-18de7d3697c8" name="Host2" url="http://ftp.dimondachnoe.esy.es">
+      <webServer id="4509f151-8acd-4b4b-95df-419678f07a89" name="Host2" url="http://ftp.dimondachnoe.esy.es">
         <fileTransfer host="ftp.dimondachnoe.esy.es" port="21">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" passiveMode="true" />

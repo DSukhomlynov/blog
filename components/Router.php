@@ -1,68 +1,85 @@
 <?php
 
+/**
+ * Класс Router
+ * Компонент для работы с маршрутами
+ */
 class Router
 {
 
-	private $routes;
+    /**
+     * Свойство для хранения массива роутов
+     * @var array
+     */
+    private $routes;
 
-	public function __construct()
-	{
-		$routesPath = ROOT.'/config/routes.php';
-		$this->routes = include($routesPath);
-	}
+    /**
+     * Конструктор
+     */
+    public function __construct()
+    {
+        // Путь к файлу с роутами
+        $routesPath = ROOT . '/config/routes.php';
 
-// Return type
+        // Получаем роуты из файла
+        $this->routes = include($routesPath);
+    }
 
-	private function getURI()
-	{
-		if (!empty($_SERVER['REQUEST_URI'])) {
-		return trim($_SERVER['REQUEST_URI'], '/');
-		}
-	}
+    /**
+     * Возвращает строку запроса
+     */
+    private function getURI()
+    {
+        if (!empty($_SERVER['REQUEST_URI'])) {
+            return trim($_SERVER['REQUEST_URI'], '/');
+        }
+    }
 
-	public function run()
-	{
-		$uri = $this->getURI();
+    /**
+     * Метод для обработки запроса
+     */
+    public function run()
+    {
+        $uri = $this->getURI();
+        foreach ($this->routes as $uriPattern => $path) {
+            if (preg_match("~^$uriPattern~", $uri)) {
+                $internalRoute = preg_replace("~^$uriPattern~", $path, $uri);
+                $segments = explode('/', $internalRoute);
 
-		foreach ($this->routes as $uriPattern => $path) {
+                $controllerName = array_shift($segments) . 'Controller';
+                $controllerName = ucfirst($controllerName);
 
-			if(preg_match("~$uriPattern~", $uri)) {
+                $actionName = 'action' . ucfirst(array_shift($segments));
 
-/*				echo "<br>Где ищем (запрос, который набрал пользователь): ".$uri;
-				echo "<br>Что ищем (совпадение из правила): ".$uriPattern;
-				echo "<br>Кто обрабатывает: ".$path; */
+                $parameters = $segments;
 
-				// Получаем внутренний путь из внешнего согласно правилу.
+                $controllerFile = ROOT . '/controllers/' .
+                    $controllerName . '.php';
 
-				$internalRoute = preg_replace("~$uriPattern~", $path, $uri);
+                if (file_exists($controllerFile)) {
+                    include_once($controllerFile);
+                }
 
-/*				echo '<br>Нужно сформулировать: '.$internalRoute.'<br>'; */
+                if (!is_callable(array($controllerName, $actionName))) {
+                    header("HTTP/1.0 404 Not Found");
+                    include($_SERVER['DOCUMENT_ROOT'] . '/views/errors/404.php');
+                    exit;
+                }
 
-				$segments = explode('/', $internalRoute);
+                $controllerObject = new $controllerName;
 
-				$controllerName = array_shift($segments).'Controller';
-				$controllerName = ucfirst($controllerName);
+                $result = call_user_func_array(array($controllerObject, $actionName), $parameters);
 
+                if ($result != null) {
+                    break;
+                } else {
+                    header("HTTP/1.0 404 Not Found");
+                    include($_SERVER['DOCUMENT_ROOT'] . '/views/errors/404.php');
+                    break;
+                }
 
-				$actionName = 'action'.ucfirst(array_shift($segments));
+            }
+        }
+    }
 
-				$parameters = $segments;
-
-
-				$controllerFile = ROOT . '/controllers/' .$controllerName. '.php';
-				if (file_exists($controllerFile)) {
-					include_once($controllerFile);
-				}
-
-				$controllerObject = new $controllerName;
-				/*$result = $controllerObject->$actionName($parameters); - OLD VERSION */
-				/*$result = call_user_func(array($controllerObject, $actionName), $parameters);*/
-				$result = call_user_func_array(array($controllerObject, $actionName), $parameters);
-				if ($result != null) {
-					break;
-				}
-			}
-
-		}
-	}
 }

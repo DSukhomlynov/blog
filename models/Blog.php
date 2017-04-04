@@ -3,15 +3,15 @@
 class Blog
 {
 
-    public static function getEntryList() {    //Получаем публикации из базы
-
+    public static function getEntryList()
+    {    //Получаем публикации из базы
         $db = Db::getConnection();
         $EntryList = array();
 
         $result = $db->query('SELECT id, author, date, comments, content FROM entry ORDER BY id DESC LIMIT 100');
 
         $i = 0;
-        while($row = $result->fetch()) {
+        while ($row = $result->fetch()) {
             $EntryList[$i]['id'] = $row['id'];
             $EntryList[$i]['author'] = $row['author'];
             $EntryList[$i]['date'] = $row['date'];
@@ -20,9 +20,7 @@ class Blog
             $i++;
         }
 
-
         return $EntryList;
-
     }
 
     public static function getEntryItemByID($id)  //Получаем публикацию из базы по номеру
@@ -32,15 +30,11 @@ class Blog
         if ($id) {
             $db = Db::getConnection();
             $result = $db->query('SELECT * FROM entry WHERE id=' . $id);
-
-            /*$result->setFetchMode(PDO::FETCH_NUM);*/
             $result->setFetchMode(PDO::FETCH_ASSOC);
-
             $EntryItem = $result->fetch();
 
             return $EntryItem;
         }
-
     }
 
     public static function getEntryItemByIDComment($id) //Получаем комментарии из базы но номеру публикации
@@ -51,33 +45,21 @@ class Blog
         $result = $db->query('SELECT id, author, comment FROM comments ORDER BY id ASC LIMIT 100');
 
         $i = 0;
-        while($row = $result->fetch()) {
-            $EntryListComments[$i]['id'] = $row['id'];
-            $EntryListComments[$i]['author'] = $row['author'];
-            $EntryListComments[$i]['comment'] = $row['comment'];
-            $i++;
-        }
-
-        $EntryListCommentsUpdate = array();
-
-        $i2 = 0;
-        foreach ($EntryListComments as $Comments) {
-            if ($Comments['id'] == $id)
-            {
-                $EntryListCommentsUpdate[$i2]['id'] = $Comments['id'];
-                $EntryListCommentsUpdate[$i2]['author'] = $Comments['author'];
-                $EntryListCommentsUpdate[$i2]['comment'] = $Comments['comment'];
-                $i2++;
+        while ($row = $result->fetch()) {
+            if ($row['id'] == $id) {
+                $EntryListComments[$i]['id'] = $row['id'];
+                $EntryListComments[$i]['author'] = $row['author'];
+                $EntryListComments[$i]['comment'] = $row['comment'];
+                $i++;
             }
         }
 
-        return $EntryListCommentsUpdate;
+        return $EntryListComments;
     }
 
 
-    public static function addNews($author, $content) //Добавляем публикацию в базу
+    public static function addRecording($author, $content) //Добавляем публикацию в базу
     {
-
         $db = Db::getConnection();
 
         $sql = 'INSERT INTO entry (author, content) '
@@ -107,14 +89,10 @@ class Blog
 
 
             $result1 = $db->query('SELECT * FROM entry WHERE id=' . $id);
-
-            /*$result->setFetchMode(PDO::FETCH_NUM);*/
             $result1->setFetchMode(PDO::FETCH_ASSOC);
 
             $EntryItem1 = $result1->fetch();
-
             $comments = $EntryItem1['comments'] + 1;
-
             $sql2 = "UPDATE entry 
             SET comments = :comments
             WHERE id = :id";
@@ -123,22 +101,21 @@ class Blog
             $result2 = $db->prepare($sql2);
             $result2->bindParam(':id', $id, PDO::PARAM_STR);
             $result2->bindParam(':comments', $comments, PDO::PARAM_STR);
-
             $result2->execute();
 
             return $result->execute();
         }
     }
 
-    public static function getEntryListSortMod() {    //Получаем публикации из базы для сортировки
-
+    public static function getEntryListSortMod()
+    {    //Получаем публикации из базы для сортировки
         $db = Db::getConnection();
         $EntryListSort = array();
 
         $result = $db->query('SELECT id, author, date, comments, content FROM entry ORDER BY id DESC LIMIT 100');
 
         $i = 0;
-        while($row = $result->fetch()) {
+        while ($row = $result->fetch()) {
             $EntryListSort[$i]['id'] = $row['id'];
             $EntryListSort[$i]['author'] = $row['author'];
             $EntryListSort[$i]['date'] = $row['date'];
@@ -146,27 +123,29 @@ class Blog
             $EntryListSort[$i]['content'] = $row['content'];
             $i++;
         }
-
-
-
         // Получение списка столбцов
         foreach ($EntryListSort as $key => $row) {
-            $comments[$key]  = $row['comments'];
+            $comments[$key] = $row['comments'];
         }
+        if (!empty($EntryListSort)) {
+            array_multisort($comments, SORT_DESC, $EntryListSort);
+        }
+        $offset = 0;
+        $length = 5;
+        $EntryListSort = array_slice($EntryListSort, $offset, $length);
 
-        array_multisort($comments, SORT_DESC, $EntryListSort);
+        $quantity =  count($EntryListSort);
 
-        for ($d = 0; $d <= 4; $d++)
+        while($quantity < 5)
         {
-            $EntryListSortMod[$d]['id'] = $EntryListSort[$d]['id'];
-            $EntryListSortMod[$d]['author'] = $EntryListSort[$d]['author'];
-            $EntryListSortMod[$d]['date'] = $EntryListSort[$d]['date'];
-            $EntryListSortMod[$d]['comments'] = $EntryListSort[$d]['comments'];
-            $EntryListSortMod[$d]['content'] = $EntryListSort[$d]['content'];
+            $EntryListSort[$quantity]['id'] = 0;
+            $EntryListSort[$quantity]['author'] = 'NoNaMe';
+            $EntryListSort[$quantity]['date'] = 'NoDaTe';
+            $EntryListSort[$quantity]['comments'] = '0';
+            $EntryListSort[$quantity]['content'] = '...';
+            $quantity++;
         }
 
-        return $EntryListSortMod;
-
+        return $EntryListSort;
     }
-
 }

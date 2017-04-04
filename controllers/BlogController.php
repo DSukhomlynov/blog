@@ -1,12 +1,11 @@
 <?php
 
-include_once ROOT. '/models/Blog.php';
+include_once ROOT . '/models/Blog.php';
 
 class BlogController
 {
     public function actionIndex()
     {
-
         require_once(ROOT . '/views/blog/title.php');
 
         return true;
@@ -14,29 +13,27 @@ class BlogController
 
     public function actionList()  // Список новостей
     {
+        $name = '';
+        $text = '';
+
+        if (isset($_POST['submit'])) {
+
+            $name = strip_tags($_POST['name']); //Защита от XSS
+            $text = strip_tags($_POST['text']); //Защита от XSS
+
+            unset($_POST);
+            $url = '/list-of-records/';
+            header("Location: $url");
+            $result = Blog::addRecording($name, $text);
+        }
 
         $entryList = array();
         $entryList = Blog::getEntryList();
 
-        $entryListSortMod = array();
-        $entryListSortMod = Blog::getEntryListSortMod();
+        $entryListSort = array();
+        $entryListSort = Blog::getEntryListSortMod();
 
-        $name = '';
-        $text = '';
-
-
-        if (isset($_POST['submit'])){
-            $name = $_POST['name'];
-            $text = $_POST['text'];
-
-            unset($_POST);
-            $url = '/list_of_records/';
-            header("Location: $url");
-            $result = Blog::addNews($name, $text);
-        }
-
-
-        require_once(ROOT . '/views/blog/list_of_records.php');
+        require_once(ROOT . '/views/blog/list-of-records.php');
 
         return true;
     }
@@ -50,26 +47,20 @@ class BlogController
             $name = '';
             $comment = '';
 
-
-            if (isset($_POST['submit'])){
-                $name = $_POST['name'];
-                $comment = $_POST['comment'];
+            if (isset($_POST['submit'])) {
+                $name = strip_tags($_POST['name']); //Защита от XSS
+                $comment = strip_tags($_POST['comment']); //Защита от XSS
 
                 unset($_POST);
 
                 $path = $entryItem['id'];
 
-                $url = "/one_entry/$path";
+                $url = "/one-entry/$path";
                 header("Location: $url");
                 $result = Blog::addComments($id, $name, $comment);
             }
-
-            require_once(ROOT . '/views/blog/one_entry.php');
-
+            require_once(ROOT . '/views/blog/one-entry.php');
         }
-
         return true;
-
     }
-
 }
